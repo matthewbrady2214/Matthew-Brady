@@ -105,7 +105,7 @@ scene.add(gridHelper);
 
 // Load model with better error handling
 const loader = new GLTFLoader();
-const modelPath = 'models/ENGR 248 Midterm.gltf';
+const modelPath = 'models/EGR 248 Midterm.gltf';
 
 loader.load(
     modelPath,
