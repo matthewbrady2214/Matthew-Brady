@@ -151,81 +151,114 @@ textarea {
 
 /* Social Links Section */
 #social-links {
-    background-color: #121212;
-    padding: 20px;
+    padding: 3rem 0;
+    background-color: #000;
+    text-align: center;
+    color: #fff;
 }
 
 .social-container {
-    max-width: 1200px;
+    max-width: 600px;
     margin: 0 auto;
-    display: flex;
-    justify-content: flex-end;
     padding: 0 20px;
 }
 
+/* LinkedIn Section Styles (unchanged) */
 .linkedin-section {
+    display: inline-block;
+    transition: transform 0.3s ease;
+    margin-bottom: 1.5rem;
+}
+
+.linkedin-link {
     display: flex;
     align-items: center;
-    margin-right: 40px; /* Adjust as needed */
+    gap: 20px;
+    text-decoration: none;
 }
 
 .linkedin-text {
     display: flex;
     align-items: center;
-    color: white;
-    margin-right: 15px;
+    gap: 10px;
 }
 
 .linkedin-text p {
     margin: 0;
-    font-size: 1.1rem;
+    font-size: 1.2rem;
+    font-weight: 500;
+    color: #fff;
 }
 
 .arrow {
     font-size: 1.5rem;
-    margin-left: 10px;
-    color: #ff3e3e;
-}
-
-.linkedin-link {
+    color: #fff;
     transition: transform 0.3s ease;
 }
 
-.linkedin-link:hover {
-    transform: scale(1.1);
+.linkedin-link:hover .arrow {
+    transform: translateX(5px);
+    color: #0a66c2;
 }
 
 .linkedin-logo {
-    width: 50px;
-    height: 50px;
+    width: 120px;
+    height: 120px;
+    transition: all 0.3s ease;
 }
 
-/* Media query for responsiveness */
-@media (max-width: 768px) {
-    .social-container {
-        justify-content: center;
-    }
-    
-    .linkedin-section {
-        margin-right: 0;
-        margin-top: 20px;
-    }
+.linkedin-link:hover .linkedin-logo {
+    transform: scale(1.1);
+    filter: brightness(1.1);
 }
 
-/* Layout to position contact and social sections side by side */
-@media (min-width: 992px) {
-    .page-bottom {
-        display: flex;
-        background-color: #121212;
+/* Phone Section Styles */
+.phone-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.phone-text {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+}
+
+.phone-text p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #aaa;
+}
+
+.phone-number {
+    font-size: 1.1rem;
+    font-weight: 500;
+    color: #fff;
+}
+
+.phone-icon {
+    width: 30px;
+    height: 30px;
+    filter: invert(1); /* Makes icon white */
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+    .linkedin-link {
+        flex-direction: column;
+        gap: 10px;
     }
     
-    #contact {
-        flex: 0 0 60%;
-    }
-    
-    #social-links {
-        flex: 0 0 40%;
-        display: flex;
-        align-items: center;
+    .phone-section {
+        flex-direction: column;
+        gap: 10px;
     }
 }
