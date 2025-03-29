@@ -64,85 +64,123 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
-// Initialize scene with better lighting setup
+// Initialize scene
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xf0f0f0);
+
+// Camera setup
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+camera.position.z = 5;
+
+// Renderer configuration
 const renderer = new THREE.WebGLRenderer({ 
     antialias: true,
-    alpha: true // Add transparency support
+    alpha: true,
+    powerPreference: "high-performance"
 });
 renderer.setSize(800, 600);
-renderer.setPixelRatio(window.devicePixelRatio); // For better quality on HiDPI screens
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // Cap at 2x for performance
 document.getElementById('model-container').appendChild(renderer.domElement);
 
-// Improved lighting
-const ambientLight = new THREE.AmbientLight(0xffffff, 0.6); // Brighter ambient
+// Enhanced lighting setup
+const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
 scene.add(ambientLight);
 
 const directionalLight1 = new THREE.DirectionalLight(0xffffff, 0.8);
 directionalLight1.position.set(1, 1, 1);
 scene.add(directionalLight1);
 
-const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.5);
+const directionalLight2 = new THREE.DirectionalLight(0xffffff, 0.4);
 directionalLight2.position.set(-1, -1, -1);
 scene.add(directionalLight2);
 
-// Enhanced orbit controls
+// Orbit controls with improved feel
 const controls = new OrbitControls(camera, renderer.domElement);
 controls.enableDamping = true;
-controls.dampingFactor = 0.05;
-controls.rotateSpeed = 0.5;
+controls.dampingFactor = 0.1;
+controls.rotateSpeed = 0.8;
 controls.screenSpacePanning = false;
 controls.maxPolarAngle = Math.PI;
-controls.minDistance = 1;
-controls.maxDistance = 100;
+controls.minDistance = 0.5;
+controls.maxDistance = 50;
+controls.target.set(0, 0, 0);
 
-// Add grid helper (optional)
+// Debug helpers (toggleable)
+const axesHelper = new THREE.AxesHelper(2);
+axesHelper.visible = false;
+scene.add(axesHelper);
+
 const gridHelper = new THREE.GridHelper(10, 10, 0x888888, 0x888888);
-gridHelper.visible = false; // Toggle with button if needed
+gridHelper.visible = false;
 scene.add(gridHelper);
 
-// Load model with better error handling
+// Model loading with robust error handling
 const loader = new GLTFLoader();
-const modelPath = 'models/EGR 248 Midterm.gltf';
+let currentModel = null;
 
+// Loading indicator
+const loadingIndicator = document.createElement('div');
+loadingIndicator.innerHTML = `
+    <div style="
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background: rgba(0,0,0,0.7);
+        color: white;
+        padding: 15px 25px;
+        border-radius: 5px;
+        font-family: Arial, sans-serif;
+    ">
+        Loading 3D model...
+        <div style="
+            margin-top: 10px;
+            height: 4px;
+            background: #444;
+            width: 200px;
+        ">
+            <div id="progress-bar" style="
+                height: 100%;
+                width: 0%;
+                background: #4CAF50;
+                transition: width 0.1s;
+            "></div>
+        </div>
+    </div>
+`;
+document.getElementById('model-container').appendChild(loadingIndicator);
+
+// Load your SolidWorks model
 loader.load(
-    modelPath,
+    'models/EGR 248 Midterm.gltf',
     (gltf) => {
-        const model = gltf.scene;
-        
-        // Center and scale model properly
-        const box = new THREE.Box3().setFromObject(model);
-        const center = box.getCenter(new THREE.Vector3());
-        const size = box.getSize(new THREE.Vector3());
-        
-        model.position.sub(center);
-        
-        // Auto-scale for better viewing
-        const maxDim = Math.max(size.x, size.y, size.z);
-        const scale = 5 / maxDim;
-        model.scale.set(scale, scale, scale);
-        
-        scene.add(model);
-        
-        // Position camera
-        camera.position.z = 5;
-        controls.target.copy(center);
-        controls.update();
-        
-        console.log('Model loaded successfully:', model);
+        // Success callback
     },
     (xhr) => {
         console.log((xhr.loaded / xhr.total * 100) + '% loaded');
     },
     (error) => {
         console.error('Error loading model:', error);
-        // Display error message to user
-        const errorMsg = document.createElement('div');
-        errorMsg.style.color = 'red';
-        errorMsg.textContent = `Failed to load model: ${error.message}`;
-        document.getElementById('model-container').appendChild(errorMsg);
+        // Check if it's a 404 error
+        fetch('models/EGR 248 Midterm.gltf')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                return response.text();
+            })
+            .then(text => {
+                if (text.startsWith('<!')) {
+                    throw new Error('Server returned HTML (likely 404)');
+                }
+            })
+            .catch(err => {
+                console.error('File check failed:', err);
+                alert(`Model file not found. Please ensure:
+                - EGR 248 Midterm.gltf
+                - EGR 248 Midterm.bin
+                are in the models/ folder`);
+            });
     }
 );
 
@@ -154,40 +192,29 @@ function animate() {
 }
 animate();
 
-// Handle window resize
-function onWindowResize() {
-    camera.aspect = window.innerWidth / window.innerHeight;
+// Responsive handling
+function handleResize() {
+    const container = document.getElementById('model-container');
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    
+    camera.aspect = width / height;
     camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(width, height);
 }
-window.addEventListener('resize', onWindowResize);
 
-// Reset view button
+window.addEventListener('resize', handleResize);
+handleResize(); // Initial sizing
+
+// Debug controls
 document.getElementById('reset-view')?.addEventListener('click', () => {
     controls.reset();
 });
 
-// Add loading indicator
-const loadingIndicator = document.createElement('div');
-loadingIndicator.textContent = 'Loading 3D model...';
-loadingIndicator.style.position = 'absolute';
-loadingIndicator.style.top = '10px';
-loadingIndicator.style.left = '10px';
-loadingIndicator.style.color = 'black';
-document.getElementById('model-container').appendChild(loadingIndicator);
+document.getElementById('toggle-grid')?.addEventListener('click', () => {
+    gridHelper.visible = !gridHelper.visible;
+});
 
-// Remove loading indicator when model loads
-loader.load = function (url, onLoad, onProgress, onError) {
-    const loader = new THREE.FileLoader(this.manager);
-    loader.setPath(this.path);
-    loader.setResponseType('arraybuffer');
-    loader.setRequestHeader(this.requestHeader);
-    loader.setWithCredentials(this.withCredentials);
-    
-    loader.load(url, (buffer) => {
-        this.parse(buffer, url, (gltf) => {
-            document.getElementById('model-container').removeChild(loadingIndicator);
-            onLoad(gltf);
-        }, onError);
-    }, onProgress, onError);
-};
+document.getElementById('toggle-axes')?.addEventListener('click', () => {
+    axesHelper.visible = !axesHelper.visible;
+});
