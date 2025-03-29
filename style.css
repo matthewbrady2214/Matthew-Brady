@@ -148,3 +148,84 @@ textarea {
     color: #e74c3c;
     border-left: 4px solid #e74c3c;
 }
+
+/* Social Links Section */
+#social-links {
+    background-color: #121212;
+    padding: 20px;
+}
+
+.social-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: flex-end;
+    padding: 0 20px;
+}
+
+.linkedin-section {
+    display: flex;
+    align-items: center;
+    margin-right: 40px; /* Adjust as needed */
+}
+
+.linkedin-text {
+    display: flex;
+    align-items: center;
+    color: white;
+    margin-right: 15px;
+}
+
+.linkedin-text p {
+    margin: 0;
+    font-size: 1.1rem;
+}
+
+.arrow {
+    font-size: 1.5rem;
+    margin-left: 10px;
+    color: #ff3e3e;
+}
+
+.linkedin-link {
+    transition: transform 0.3s ease;
+}
+
+.linkedin-link:hover {
+    transform: scale(1.1);
+}
+
+.linkedin-logo {
+    width: 50px;
+    height: 50px;
+}
+
+/* Media query for responsiveness */
+@media (max-width: 768px) {
+    .social-container {
+        justify-content: center;
+    }
+    
+    .linkedin-section {
+        margin-right: 0;
+        margin-top: 20px;
+    }
+}
+
+/* Layout to position contact and social sections side by side */
+@media (min-width: 992px) {
+    .page-bottom {
+        display: flex;
+        background-color: #121212;
+    }
+    
+    #contact {
+        flex: 0 0 60%;
+    }
+    
+    #social-links {
+        flex: 0 0 40%;
+        display: flex;
+        align-items: center;
+    }
+}
